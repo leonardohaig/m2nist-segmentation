@@ -101,7 +101,11 @@ class Train(object):
             tf.summary.scalar("learn_rate", self.learn_rate)
             tf.summary.scalar("total_loss", self.total_loss)
             tf.summary.image("input_gt_image", self.img_bath, max_outputs=3)
-            # tf.summary.image("train_pred_image", self.train_pred_image, max_outputs=3)
+
+            train_pred_image = tf.argmax(self.model.get_inference(), axis=-1)  # [B,H,W],返回 C 通道最大值的索引
+            train_pred_image = tf.cast(train_pred_image,tf.float32) /11.0
+            self.train_pred_image = tf.expand_dims(train_pred_image,axis=-1)
+            tf.summary.image("train_pred_image", self.train_pred_image, max_outputs=3)
 
             self.write_op = tf.summary.merge_all()  # 将所有summary全部保存到磁盘,以便tensorboard显示
             self.summary_writer = tf.summary.FileWriter(

@@ -21,10 +21,12 @@ class Model(object):
         :param trainable:
         """
         self.trainable = trainable
-        self.inference_ret = self.__build_network(input_data)
+        self.decode_ret = self.__build_network(input_data)
 
     def get_inference(self):
-        return self.inference_ret
+        decode_ret_prob = tf.nn.softmax(self.decode_ret) # [B,H,W,cls]
+        # infer_ret = tf.argmax(decode_ret_prob, axis=-1)  # [B,H,W],返回 C 通道最大值的索引
+        return decode_ret_prob
 
     def __build_network(self,input_data):
         """
@@ -93,25 +95,39 @@ class Model(object):
         :return:
         """
         decode_logits_reshape = tf.reshape(
-            self.inference_ret,
-            shape=[self.inference_ret.get_shape().as_list()[0],
+            self.decode_ret,
+            shape=[self.decode_ret.get_shape().as_list()[0],
                    -1,
-                   self.inference_ret.get_shape().as_list()[3]])
+                   self.decode_ret.get_shape().as_list()[3]])
 
         gt_masks_reshape = tf.reshape(
             gt_masks,
             shape=[gt_masks.get_shape().as_list()[0],
                    -1])
         gt_masks_reshape = tf.one_hot(gt_masks_reshape,depth=11)
-        class_weights = tf.constant([[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,0.4]])
 
-        weights_loss = tf.reduce_sum(tf.multiply(gt_masks_reshape, class_weights), 2)
+        class_weights = 10*[1.0] + [0.2] # lable为10的class权重为0.2,0-9个class为1，输出一个list
+        class_weights = tf.convert_to_tensor(class_weights) # 将list转换为tensor,shape为[11,]
+        weights_loss = tf.reduce_sum(
+            tf.multiply(gt_masks_reshape, class_weights),# 自动进行broadcast,[batch_size,11],[11,],乘积为[B,11]
+            -1)
+        # logits是神经网络的输出, 注意要求是softmax处理之前的logits,
+        # 因为tf.losses.softmax_cross_entropy()方法内部会对logits做softmax处理
         binary_segmentation_loss = tf.losses.softmax_cross_entropy(onehot_labels=gt_masks_reshape,
                                                                    logits=decode_logits_reshape,
                                                                    weights=weights_loss)
         binary_segmentation_loss = tf.reduce_mean(binary_segmentation_loss)
 
         return binary_segmentation_loss
+
+    # def computer_accuracy(self,gt_masks):
+    #     pass
+
+    def get_pred_image_summary(self):
+
+        pass
+
+
 
 
 if __name__ == '__main__':
