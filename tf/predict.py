@@ -78,7 +78,7 @@ def test_model(imgs_pth,weights_pth):
 
 
 if __name__ == '__main__':
-    os.chdir(os.path.dirname(__file__))
+    os.chdir(os.path.split(os.path.abspath(__file__))[0])
 
     # init args
     args = init_args()

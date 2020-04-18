@@ -205,7 +205,7 @@ def split_m2nist(data_rootdir):
 
 
 if __name__ == '__main__':
-    data_rootdir = os.path.join(os.path.split(os.path.realpath(__file__))[0], 'm2nist')
+    data_rootdir = os.path.join(os.path.split(os.path.abspath(__file__))[0], 'm2nist')
     # download_m2nist_if_not_exist()
     # split_m2nist(data_rootdir)
 

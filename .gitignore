@@ -132,7 +132,10 @@ dmypy.json
 
 m2nist/*.txt
 m2nist/*.npy
-m2nist/*.zip
+# m2nist/*.zip
 
 tf/checkpoint/
 tf/train_log/
+
+pytorch/checkpoint/
+pytorch/train_log/

@@ -1,0 +1,19 @@
+#YAML: 1.0
+---
+#================================#
+USE_CUDA: 0
+Train.max_epochs: 20
+Train.lr_init: 0.001
+Train.lr_end: 0.0001
+Train.moving_ave_decay: 0.995
+Train.model_save_dir: './checkpoint'
+Train.batch_size: 5
+Train.images_pth: '../m2nist/train_imgs.npy'
+Train.masks_pth: '../m2nist/train_masks.npy'
+Train.log_dir: './train_log'
+
+
+#
+Val.batch_size: 5
+Val.images_pth: '../m2nist/val_imgs.npy'
+Val.masks_pth: '../m2nist/val_masks.npy'
